@@ -58,8 +58,18 @@ To ask for the permission from health connect
 
 ```text
 HealthConnect.authorize(async(result) => {
-    
+
 },(error) => {
     
 })
 ```
+
+## TO-DO
+
+get following health data from health connect
+
+- Steps
+- Heart Rate
+- Cycling Distance
+- Activities
+- Sleep
