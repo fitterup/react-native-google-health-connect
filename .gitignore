@@ -42,11 +42,11 @@ yarn-error.log
 # example
 example/
 
-# rename
-rename.js
+# # rename
+# rename.js
 
-# license
-LICENSE
+# # license
+# LICENSE
 
 # BUCK
 buck-out/
