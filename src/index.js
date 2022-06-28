@@ -20,13 +20,13 @@ class RNHealthConnect {
     return isAuthorized
   }
 
-  getDailySteps = async (date = moment()) => {
-    const options = {
-      startDate: moment(date).startOf('day'),
-      endDate: moment(date).endOf('day'),
-    }
-    return healthConnect.getDailySteps(options)
-  }
+  // getDailySteps = async (date = moment()) => {
+  //   const options = {
+  //     startDate: moment(date).startOf('day'),
+  //     endDate: moment(date).endOf('day'),
+  //   }
+  //   return healthConnect.getDailySteps(options)
+  // }
 }
 
 export default new RNHealthConnect()

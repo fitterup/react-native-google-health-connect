@@ -103,14 +103,14 @@ class RNHealthConnectModule(reactContext: ReactApplicationContext) : ReactContex
 //        }
 //    }
 
-    @ReactMethod
-    fun getDailySteps(start: Instant, end: Instant, promise: Promise) {
-        myPluginScope.launch {
-            val steps = healthConnectManager.getDailyStepCountSamples(start, end)
-            Log.d("TAGG", "steps=${steps.toString()}")
-            promise.resolve(steps)
-        }
-    }
+    // @ReactMethod
+    // fun getDailySteps(start: Instant, end: Instant, promise: Promise) {
+    //     myPluginScope.launch {
+    //         val steps = healthConnectManager.getDailyStepCountSamples(start, end)
+    //         Log.d("TAGG", "steps=${steps.toString()}")
+    //         promise.resolve(steps)
+    //     }
+    // }
 
     override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == HEALTH_PERMISSION_REQUEST) {
