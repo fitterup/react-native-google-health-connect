@@ -3,7 +3,7 @@ import { NativeModules } from 'react-native'
 
 const healthConnect = NativeModules.RNHealthConnectModule
 
-class RNHealthConnect {
+class HealthConnect {
   authorize = (callback) => {
     healthConnect.authorize(
       (result) => {
@@ -29,4 +29,4 @@ class RNHealthConnect {
   // }
 }
 
-export default new RNHealthConnect()
+export default new HealthConnect()

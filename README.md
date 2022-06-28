@@ -41,3 +41,25 @@ Declare the permissions your app will use. Create an array resource in ```res/va
 ```
 
 Note that you will need to add a line for every permission your app will use:
+
+## USAGE
+
+1. ```import HealthConnect from 'react-native-google-health-connect';```
+
+2. Authorize:
+
+To check whether HealthConnect is already authorized, simply use a function
+
+```text
+const isAuthorized = await HealthConnect.checkIsAuthorized()
+```
+
+To ask for the permission from health connect
+
+```text
+HealthConnect.authorize(async(result) => {
+    
+},(error) => {
+    
+})
+```
