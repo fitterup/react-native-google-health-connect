@@ -42,6 +42,12 @@ yarn-error.log
 # example
 example/
 
+# rename
+rename.js
+
+# license
+LICENSE
+
 # BUCK
 buck-out/
 \.buckd/
