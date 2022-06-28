@@ -31,4 +31,13 @@ Declare the below in your Activity in ```AndroidManifest.xml``` to handle intent
 
 Declare the permissions your app will use. Create an array resource in ```res/values/health_permissions.xml```
 
+```text
+<resources>
+  <array name="health_permissions">
+    <item>androidx.health.permission.HeartRate.READ</item>
+    <item>androidx.health.permission.Steps.READ</item>
+  </array>
+</resources>
+```
+
 Note that you will need to add a line for every permission your app will use:
