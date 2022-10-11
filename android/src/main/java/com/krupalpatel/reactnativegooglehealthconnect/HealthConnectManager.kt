@@ -21,16 +21,14 @@ import android.os.Build
 import androidx.compose.runtime.mutableStateOf
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
+import androidx.health.connect.client.aggregate.AggregationResult
 import androidx.health.connect.client.metadata.DataOrigin
 import androidx.health.connect.client.permission.HealthDataRequestPermissions
 import androidx.health.connect.client.permission.Permission
-import androidx.health.connect.client.records.ActivitySession
-import androidx.health.connect.client.records.Record
-import androidx.health.connect.client.records.Steps
+import androidx.health.connect.client.records.*
+import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.ReactMethod
 import java.time.Instant
 
 
@@ -91,6 +89,41 @@ class HealthConnectManager(private val context: Context) {
         )
         val response = healthConnectClient.readRecords(request)
         return response.records
+    }
+
+    suspend fun getDailyHeartRateCount(start: Instant, end: Instant): List<HeartRateSeries> {
+        val request = ReadRecordsRequest(
+            recordType = HeartRateSeries::class,
+            timeRangeFilter = TimeRangeFilter.between(start, end)
+        )
+        val response = healthConnectClient.readRecords(request)
+        return response.records
+    }
+
+    suspend fun getDailySleepSamples(start: Instant, end: Instant): List<SleepSession> {
+        val request = ReadRecordsRequest(
+            recordType = SleepSession::class,
+            timeRangeFilter = TimeRangeFilter.between(start, end)
+        )
+        val response = healthConnectClient.readRecords(request)
+        return response.records
+    }
+
+    suspend fun getAggregatedStepsSamples(start: Instant, end: Instant): Long {
+
+        val timeRangeFilter = TimeRangeFilter.between(
+            startTime = start,
+            endTime = end
+        )
+        val aggregateDataTypes = setOf(Steps.COUNT_TOTAL)
+
+        val aggregateRequest = AggregateRequest(
+            metrics = aggregateDataTypes,
+            timeRangeFilter = timeRangeFilter
+        )
+        val response = healthConnectClient.aggregate(aggregateRequest)
+        val steps = response[Steps.COUNT_TOTAL]?.toLong() ?: 0L
+        return steps
     }
 
 

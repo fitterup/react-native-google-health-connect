@@ -6,11 +6,14 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.health.connect.client.permission.HealthDataRequestPermissions
 import androidx.health.connect.client.permission.Permission
-import androidx.health.connect.client.records.ActivitySession
-import androidx.health.connect.client.records.Steps
-import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.records.*
+import androidx.health.connect.client.request.AggregateRequest
+import androidx.health.connect.client.time.TimeRangeFilter
 import com.facebook.react.bridge.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.time.Instant
 
 
@@ -37,7 +40,17 @@ class RNHealthConnectModule(reactContext: ReactApplicationContext) : ReactContex
         reactApplicationContext.addActivityEventListener(this)
     }
 
-    private val PERMISSIONS = setOf(Permission.createReadPermission(Steps::class))
+    private val PERMISSIONS = setOf(
+        Permission.createReadPermission(Steps::class),
+        Permission.createReadPermission(HeartRateSeries::class)
+    )
+
+//    private val permissions = setOf(
+//        Permission.createWritePermission(Steps::class),
+//        Permission.createWritePermission(SpeedSeries::class),
+//        Permission.createWritePermission(Distance::class),
+//        Permission.createWritePermission(HeartRateSeries::class)
+//    )
 
     private val myPluginScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
@@ -50,6 +63,7 @@ class RNHealthConnectModule(reactContext: ReactApplicationContext) : ReactContex
         if (availability == HealthConnectAvailability.INSTALLED) {
             myPluginScope.launch {
                 hasPermission = healthConnectManager.hasAllPermissions(PERMISSIONS)
+                Log.d("TAGG", "hasPermission=${hasPermission}")
                 if(!hasPermission) {
                     try {
                         val intent = HealthDataRequestPermissions().createIntent(reactApplicationContext, PERMISSIONS)
@@ -88,29 +102,81 @@ class RNHealthConnectModule(reactContext: ReactApplicationContext) : ReactContex
         }
     }
 
-//    @ReactMethod
-//    fun getDailyStepCountSamples(
-//        startDate: Double,
-//        endDate: Double,
-//        bucketInterval: Int,
-//        bucketUnit: String?,
-//        promise: Promise
-//    ) {
-//        try {
-//
-//        } catch (e: Error) {
-//            promise.reject(e)
-//        }
-//    }
+     @ReactMethod
+     fun getDailySteps(start: String, end: String, promise: Promise) {
+         myPluginScope.launch {
+//             Log.d("TAGG", "start=${Instant.parse(start)},end=${Instant.parse(end)}}")
+             val steps = healthConnectManager.getDailyStepCountSamples(Instant.parse(start), Instant.parse(end))
+             val array = Arguments.createArray()
+             for (stepRecord in steps) {
+                 val map = Arguments.createMap()
+                 map.putDouble("count", stepRecord.count.toDouble())
+                 map.putString("startTime", stepRecord.startTime.toString())
+                 map.putString("endTime", stepRecord.endTime.toString())
+                 map.putString("startZoneOffset", stepRecord.startZoneOffset.toString())
+                 map.putString("endZoneOffset", stepRecord.endZoneOffset.toString())
 
-    // @ReactMethod
-    // fun getDailySteps(start: Instant, end: Instant, promise: Promise) {
-    //     myPluginScope.launch {
-    //         val steps = healthConnectManager.getDailyStepCountSamples(start, end)
-    //         Log.d("TAGG", "steps=${steps.toString()}")
-    //         promise.resolve(steps)
-    //     }
-    // }
+//                 Log.d("TAGG", "count=${stepRecord.count},startTime=${stepRecord.startTime},endTime=${stepRecord.endTime}")
+
+                 array.pushMap(map)
+             }
+
+             promise.resolve(array)
+         }
+     }
+
+    @ReactMethod
+    fun getDailyHeartRate(start: String, end: String, promise: Promise) {
+        myPluginScope.launch {
+//             Log.d("TAGG", "start=${Instant.parse(start)},end=${Instant.parse(end)}}")
+            val heartRateSeries = healthConnectManager.getDailyHeartRateCount(Instant.parse(start), Instant.parse(end))
+            for (heartRate in heartRateSeries) {
+                for(heart in heartRate.samples){
+                    Log.d("TAGG", "beats=${heart.beatsPerMinute},time=${heart.time},start=${heartRate.startTime}")
+                }
+
+            }
+
+        }
+    }
+
+    @ReactMethod
+    fun getDailySleepSamples(start: String, end: String, promise: Promise) {
+//        myPluginScope.launch {
+////             Log.d("TAGG", "start=${Instant.parse(start)},end=${Instant.parse(end)}}")
+//            val sleepSession = healthConnectManager.getDailySleepSamples(Instant.parse(start), Instant.parse(end))
+//
+//            Log.d("TAGG", "sleepSession=${sleepSession}")
+//        }
+    }
+
+
+
+    @ReactMethod
+    fun getAggregatedSteps(start: String, end: String, promise: Promise) {
+        myPluginScope.launch {
+//             Log.d("TAGG", "start=${Instant.parse(start)},end=${Instant.parse(end)}}")
+            val steps = healthConnectManager.getAggregatedStepsSamples(Instant.parse(start), Instant.parse(end))
+            val map = Arguments.createMap()
+            map.putDouble("steps", steps.toDouble())
+            Log.d("TAGG", "steps=${steps}}")
+//            val array = Arguments.createArray()
+//            for (stepRecord in steps) {
+//                val map = Arguments.createMap()
+//                map.putDouble("count", stepRecord.count.toDouble())
+//                map.putString("startTime", stepRecord.startTime.toString())
+//                map.putString("endTime", stepRecord.endTime.toString())
+//                map.putString("startZoneOffset", stepRecord.startZoneOffset.toString())
+//                map.putString("endZoneOffset", stepRecord.endZoneOffset.toString())
+//
+////                 Log.d("TAGG", "count=${stepRecord.count},startTime=${stepRecord.startTime},endTime=${stepRecord.endTime}")
+//
+//                array.pushMap(map)
+//            }
+//
+            promise.resolve(map)
+        }
+    }
 
     override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == HEALTH_PERMISSION_REQUEST) {
