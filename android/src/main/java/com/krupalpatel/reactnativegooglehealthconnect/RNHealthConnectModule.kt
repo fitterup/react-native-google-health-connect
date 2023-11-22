@@ -159,6 +159,16 @@ class RNHealthConnectModule(reactContext: ReactApplicationContext) : ReactContex
         }
     }
 
+     @ReactMethod
+    fun getAggregatedDistance(start: String, end: String, promise: Promise) {
+        myPluginScope.launch {
+            val distance = healthConnectManager.getAggregatedDistance(Instant.parse(start), Instant.parse(end))
+            val map = Arguments.createMap()
+            map.putDouble("distance", distance.toDouble())
+            promise.resolve(map)
+        }
+    }
+
     override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == HEALTH_PERMISSION_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {

@@ -56,6 +56,16 @@ class HealthConnect {
     const endDate = moment().endOf('day').add(offset, 'minutes').toISOString()
     return await healthConnect.getAggregatedSteps(startDate, endDate)
   }
+
+  getAggregatedDistance = async (date = moment()) => {
+    var offset = moment(date).utcOffset()
+    const startDate = moment(date)
+      .startOf('day')
+      .add(offset, 'minutes')
+      .toISOString()
+    const endDate = moment().endOf('day').add(offset, 'minutes').toISOString()
+    return await healthConnect.getAggregatedDistance(startDate, endDate)
+  }
 }
 
 export default new HealthConnect()
