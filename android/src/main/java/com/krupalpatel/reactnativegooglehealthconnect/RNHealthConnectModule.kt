@@ -45,12 +45,12 @@ class RNHealthConnectModule(reactContext: ReactApplicationContext) : ReactContex
         Permission.createReadPermission(HeartRateSeries::class)
     )
 
-//    private val permissions = setOf(
-//        Permission.createWritePermission(Steps::class),
-//        Permission.createWritePermission(SpeedSeries::class),
-//        Permission.createWritePermission(Distance::class),
-//        Permission.createWritePermission(HeartRateSeries::class)
-//    )
+    private val permissions = setOf(
+        Permission.createWritePermission(Steps::class),
+        Permission.createWritePermission(SpeedSeries::class),
+        Permission.createWritePermission(Distance::class),
+        Permission.createWritePermission(HeartRateSeries::class)
+    )
 
     private val myPluginScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
@@ -116,8 +116,6 @@ class RNHealthConnectModule(reactContext: ReactApplicationContext) : ReactContex
                  map.putString("startZoneOffset", stepRecord.startZoneOffset.toString())
                  map.putString("endZoneOffset", stepRecord.endZoneOffset.toString())
 
-//                 Log.d("TAGG", "count=${stepRecord.count},startTime=${stepRecord.startTime},endTime=${stepRecord.endTime}")
-
                  array.pushMap(map)
              }
 
@@ -128,7 +126,6 @@ class RNHealthConnectModule(reactContext: ReactApplicationContext) : ReactContex
     @ReactMethod
     fun getDailyHeartRate(start: String, end: String, promise: Promise) {
         myPluginScope.launch {
-//             Log.d("TAGG", "start=${Instant.parse(start)},end=${Instant.parse(end)}}")
             val heartRateSeries = healthConnectManager.getDailyHeartRateCount(Instant.parse(start), Instant.parse(end))
             for (heartRate in heartRateSeries) {
                 for(heart in heartRate.samples){
@@ -155,25 +152,9 @@ class RNHealthConnectModule(reactContext: ReactApplicationContext) : ReactContex
     @ReactMethod
     fun getAggregatedSteps(start: String, end: String, promise: Promise) {
         myPluginScope.launch {
-//             Log.d("TAGG", "start=${Instant.parse(start)},end=${Instant.parse(end)}}")
             val steps = healthConnectManager.getAggregatedStepsSamples(Instant.parse(start), Instant.parse(end))
             val map = Arguments.createMap()
             map.putDouble("steps", steps.toDouble())
-            Log.d("TAGG", "steps=${steps}}")
-//            val array = Arguments.createArray()
-//            for (stepRecord in steps) {
-//                val map = Arguments.createMap()
-//                map.putDouble("count", stepRecord.count.toDouble())
-//                map.putString("startTime", stepRecord.startTime.toString())
-//                map.putString("endTime", stepRecord.endTime.toString())
-//                map.putString("startZoneOffset", stepRecord.startZoneOffset.toString())
-//                map.putString("endZoneOffset", stepRecord.endZoneOffset.toString())
-//
-////                 Log.d("TAGG", "count=${stepRecord.count},startTime=${stepRecord.startTime},endTime=${stepRecord.endTime}")
-//
-//                array.pushMap(map)
-//            }
-//
             promise.resolve(map)
         }
     }
