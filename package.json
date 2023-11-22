@@ -30,6 +30,7 @@
     "compile": "rm -rf lib && tsc -p .",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "prepare": "yarn compile",
+    "release": "release-it",
     "test": "jest"
   },
   "devDependencies": {
